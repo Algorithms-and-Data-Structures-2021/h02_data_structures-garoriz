@@ -12,7 +12,7 @@ void LinkedList::Add(Element e) {
   // Tip 2: есть 2 случая - список пустой и непустой
   // Tip 3: не забудьте обновить поля head и tail
   // напишите свой код здесь ...
-  if (head_ == nullptr) {
+  if (size_ == 0) {
       Node *node = new Node(e, nullptr);
       head_ = node;
       tail_ = node;
@@ -86,12 +86,16 @@ Element LinkedList::Remove(int index) {
 
 void LinkedList::Clear() {
   // Tip 1: люди в черном (MIB) пришли стереть вам память
-    if (!head_) return;
-    for (int i = size_ - 1; i >= 1; --i) {
-        delete tail_;
-        size_--;
-        tail_ = head_ + size_;
+    Node *node = head_;
+    for (int i = 0; i < size_; ++i) {
+        Node *t = node->next;
+        delete node;
+        node = t;
     }
+    delete node;
+    size_ = 0;
+    head_ = nullptr;
+    tail_ = nullptr;
 }
 
 Element LinkedList::Get(int index) const {
@@ -105,8 +109,8 @@ int LinkedList::IndexOf(Element e) const {
     for (int i = 0; i < size_; ++i) {
         if (node->data == e) {
             return i;
-            node = node->next;
         }
+        node = node->next;
     }
   return -1;
 }

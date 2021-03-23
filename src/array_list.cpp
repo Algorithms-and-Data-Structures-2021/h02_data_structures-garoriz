@@ -14,7 +14,9 @@ namespace itis {
         }
 
         // Tip 1: используйте std::fill для заполнения выделенных ячеек массива значением Element::UNINITIALIZED
-        std::fill(data_, data_ + capacity - 1, Element::UNINITIALIZED);
+        data_ = new Element[capacity_];
+        size_ = 0;
+        std::fill(data_, data_ + capacity, Element::UNINITIALIZED);
     }
 
     ArrayList::~ArrayList() {
@@ -29,7 +31,7 @@ namespace itis {
     void ArrayList::Add(Element e) {
         // Tip 1: используйте метод resize(new_capacity) для расширения емкости массива
         if (size_ == capacity_) {
-            resize(kCapacityGrowthCoefficient);
+            resize(capacity_ + kCapacityGrowthCoefficient);
         }
 
         assert(size_ < capacity_);  // я здесь, чтобы не дать тебе сойти с правильного пути
@@ -45,15 +47,13 @@ namespace itis {
 
         // Tip 1: используйте метод resize(new_capacity) для расширения емкости массива
         if (size_ == capacity_) {
-            resize(kCapacityGrowthCoefficient);
+            resize(capacity_ + kCapacityGrowthCoefficient);
         }
 
         assert(size_ < capacity_);  // я ни в коем случае не дам вам совершить ошибку всей вашей жизни
 
         // Tip 2: для свдига элементов вправо можете использовать std::copy
-        for (int i = size_ - 1; i > index - 1; --i) {
-            data_[i + 1] = data_[i];
-        }
+        std::copy(data_ + index, data_ + size_, data_ + index + 1);
         data_[index] = e;
         size_++;
     }
@@ -69,9 +69,7 @@ namespace itis {
         // Tip 1: можете использовать std::copy для сдвига элементов влево
         // Tip 2: не забудьте задать значение Element::UNINITIALIZED освободившейся ячейке
         Element value = data_[index];
-        for (int i = index; i < size_ - 1; ++i) {
-            data_[i] = data_[i + 1];
-        }
+        std::copy(data_ + index + 1, data_ + size_, data_ + index);
         data_[size_ - 1] = Element::UNINITIALIZED;
         size_--;
         return value;
@@ -79,7 +77,7 @@ namespace itis {
 
     void ArrayList::Clear() {
         // Tip 1: можете использовать std::fill для заполнения ячеек массива значением  Element::UNINITIALIZED
-        std::fill(data_[0], data_[size_ - 1], Element::UNINITIALIZED);
+        std::fill(data_, data_ + size_, Element::UNINITIALIZED);
         size_ = 0;
     }
 
@@ -131,13 +129,13 @@ namespace itis {
         auto new_data = new Element[new_capacity];
 
         // 2. копируем данные на новый участок
-        std::copy(data_, data_ + size_ - 1, new_data);
+        std::copy(data_, data_ + size_, new_data);
 
         // 3. заполняем "свободные" ячейки памяти значением Element::UNINITIALIZED
-        std::fill(new_data + size_, new_data + new_capacity - 1, Element::UNINITIALIZED);
+        std::fill(new_data + size_, new_data + new_capacity, Element::UNINITIALIZED);
 
         // 4. высвобождаем старый участок памяти меньшего размера
-        delete data_;
+        delete[] data_;
 
         // 5. пересылаем указатель на новый участок памяти
         data_ = new_data;
